@@ -1,0 +1,7 @@
+{
+  "name": "adventour",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
