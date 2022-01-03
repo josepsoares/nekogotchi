@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "nekogoshi",
+	"webDir": "build",
+	"bundledWebRuntime": false
+}
