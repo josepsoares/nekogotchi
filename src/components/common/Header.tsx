@@ -7,22 +7,36 @@ import {
   IonLabel,
   IonList,
   IonTitle,
+  IonToggle,
   IonToolbar,
   useIonPopover,
 } from "@ionic/react";
-import { ellipsisVertical, help, logOut } from "ionicons/icons";
+import { ellipsisVertical, help, logOut, moon } from "ionicons/icons";
+
+const toggleDarkModeHandler = () => {
+  document.body.classList.toggle("dark");
+};
 
 const PopoverList: React.FC<{
   onHide: () => void;
 }> = ({ onHide }) => (
   <IonList>
-    <IonItem button={true} detail={false} routerLink="/help">
+    <IonItem lines="none" button={true} detail={false} routerLink="/help">
       <IonIcon slot="start" icon={help} />
       <IonLabel>Help</IonLabel>
     </IonItem>
-    <IonItem button={true} routerLink="/" onClick={() => {}}>
+    <IonItem lines="none" button={true} routerLink="/" onClick={() => {}}>
       <IonIcon slot="start" icon={logOut} />
       <IonLabel>Logout</IonLabel>
+    </IonItem>
+    <IonItem lines="none">
+      <IonIcon slot="start" icon={moon} />
+      <IonLabel>Dark Mode</IonLabel>
+      <IonToggle
+        slot="end"
+        name="darkMode"
+        onIonChange={toggleDarkModeHandler}
+      />
     </IonItem>
   </IonList>
 );

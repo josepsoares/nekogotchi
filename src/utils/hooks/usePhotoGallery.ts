@@ -11,23 +11,29 @@ import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Storage } from "@capacitor/storage";
 import { Capacitor } from "@capacitor/core";
 import { Haptics } from "@capacitor/haptics";
+import nekoPhotoMessages from "../helpers/nekoPhotoMessages";
 
 export interface UserPhoto {
   filepath: string;
   webviewPath?: string;
+  reaction?: {
+    message: string;
+    reactionImg: string;
+  };
 }
 
 const PHOTO_STORAGE = "photos";
 
 export function usePhotoGallery() {
   const [photos, setPhotos] = useState<UserPhoto[]>([]);
+  const [modal, setModal] = useState(false);
+  const [modalImg, setModalImg] = useState<UserPhoto>();
 
   useEffect(() => {
     const loadSaved = async () => {
       const { value } = await Storage.get({ key: PHOTO_STORAGE });
 
       const photosInStorage = (value ? JSON.parse(value) : []) as UserPhoto[];
-      // If running on the web...
       if (!isPlatform("hybrid")) {
         for (let photo of photosInStorage) {
           const file = await Filesystem.readFile({
@@ -48,7 +54,6 @@ export function usePhotoGallery() {
     fileName: string
   ): Promise<UserPhoto> => {
     let base64Data: string;
-    // "hybrid" will detect Cordova or Capacitor;
     if (isPlatform("hybrid")) {
       const file = await Filesystem.readFile({
         path: photo.path!,
@@ -65,7 +70,6 @@ export function usePhotoGallery() {
 
     if (isPlatform("hybrid")) {
       // Display the new image by rewriting the 'file://' path to HTTP
-      // Details: https://ionicframework.com/docs/building/webview#file-protocol
       return {
         filepath: savedFile.uri,
         webviewPath: Capacitor.convertFileSrc(savedFile.uri),
@@ -89,16 +93,45 @@ export function usePhotoGallery() {
 
     const fileName = new Date().getTime() + ".jpeg";
     const savedFileImage = await savePicture(photo, fileName);
+
+    const getReaction =
+      nekoPhotoMessages[(nekoPhotoMessages.length * Math.random()) | 0];
+
+    savedFileImage.reaction = getReaction;
+
     const newPhotos = [savedFileImage, ...photos];
     setPhotos(newPhotos);
+    setModalImg(savedFileImage);
+    setModal(!modal);
+
     Storage.set({ key: PHOTO_STORAGE, value: JSON.stringify(newPhotos) });
 
     await Haptics.vibrate();
   };
 
+  const deletePhoto = async (photo: UserPhoto) => {
+    // Remove this photo from the Photos reference data array
+    const newPhotos = photos.filter((p) => p.filepath !== photo.filepath);
+
+    // Update photos array cache by overwriting the existing photo array
+    Storage.set({ key: PHOTO_STORAGE, value: JSON.stringify(newPhotos) });
+
+    // delete photo file from filesystem
+    const filename = photo.filepath.substr(photo.filepath.lastIndexOf("/") + 1);
+    await Filesystem.deleteFile({
+      path: filename,
+      directory: Directory.Data,
+    });
+    setPhotos(newPhotos);
+  };
+
   return {
+    modal,
+    modalImg,
+    setModal,
     photos,
     takePhoto,
+    deletePhoto,
   };
 }
 

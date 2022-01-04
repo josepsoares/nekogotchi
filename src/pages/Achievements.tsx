@@ -11,7 +11,7 @@ const Achievements: React.FC<IAchievementsProps> = () => {
       <Header title="Achievements" />
 
       <IonContent>
-        <div className="p-8 h-5/6 flex flex-col items-center justify-center">
+        <div className="px-4 h-5/6 flex flex-col items-center justify-center">
           <IonImg
             className="w-80 h-auto"
             alt="purr magic"

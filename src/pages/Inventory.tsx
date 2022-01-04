@@ -11,7 +11,7 @@ const Inventory: React.FC<IInventoryProps> = () => {
       <Header title="Inventory" />
 
       <IonContent>
-        <div className="p-8 lg:p-20 h-5/6 flex flex-col items-center justify-center">
+        <div className="px-4 lg:p-20 h-5/6 flex flex-col items-center justify-center">
           <IonImg
             className="w-80 h-auto"
             alt="purr magic"
